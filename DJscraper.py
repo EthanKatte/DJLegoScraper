@@ -69,7 +69,6 @@ def writeCurrentCodes():
 def linebreak():
     print("---------------------------------------------------------------------------------------------------")
 
-
 def update():
     
         oldItemArr, oldUnknownLinks = readCurrentCodes() #gets the item codes and unkowns from DJ's
@@ -120,16 +119,6 @@ def update():
             for item in removed:
                 print("\t"+item)
         linebreak()
-
-
-
-
-        
-        
-
-
-        
-
 
 def check():
     ###GETTING THE CODES FROM DavidJones.com###
@@ -189,15 +178,47 @@ def check():
         print("NO UPDATES WERE WRITTEN")
         linebreak()        
         
+def printFunc():
+    curritems, currLinks = readCurrentCodes()
+    linebreak()
+    for item in curritems:
+        print(item)
+    linebreak()
+    linebreak()
+    for link in currLinks:
+        print(link)
+    linebreak()
 
+def searchFunc():
+    
+    argLength = len(sys.argv)
+    if argLength == 3 and sys.argv[2] == "-new":
+        curritems, currLinks = getListedItems()
+    else:
+        curritems, currLinks = readCurrentCodes()
+
+    code = input("What code would you like to check? (type 'quit' to leave) ")
+    while code != "quit":
+        if code in curritems:
+            print("\nYes, David Jones has {} in stock\n".format(code))
+        else:
+            print("\nNo, David Jones does not have {} in stock\n".format(code))
+        code = input("What code would you like to check? (type 'quit' to leave) ")
+
+            
 
 def main():
     if(len(sys.argv)==1):
-        print("Whatcha tryin to do pal? Your options are:\n\t -update : updates the recorded lego codes (currentCodes.txt)\n\t -check : checks for any new lego products\n\t")
+        print("Whatcha tryin to do pal? Your options are:\n\t -update : updates the recorded lego codes (currentCodes.txt, currentLinks.txt)\n\t -check : checks for any new lego products\n\t -print : prints all the current records\n\t -search : search for a code (use -new to search through an updated list)")
+        return
     if(sys.argv[1] == "-update"):
         update()
     elif sys.argv[1] =="-check":
         check()
+    elif sys.argv[1] == "-print":
+        printFunc()
+    elif sys.argv[1] == "-search":
+        searchFunc()
     
 
 
