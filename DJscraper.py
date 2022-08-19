@@ -36,20 +36,25 @@ def getListedItems():
         print("New Page: Current Number Total : {}".format(numberTotal)) #tracks page level and 
     return codes, unknownLinks
 
-
-
-def readCurrentCodes():
+def readCurrentCodes(): #reads and returns the most recent save of the codes on the website
     FcurrentCodes = open("currentCodes.txt", "r")
     readCodes = (FcurrentCodes.read()).split()
-    print(readCodes)
     FcurrentCodes.close
 
     FunknownLinks = open("unknownLinks.txt", "r")
     readLinks = (FunknownLinks.read()).split()
-    print(readLinks)
     FunknownLinks.close()
 
-def writeCurrentCodes(currentCodes, unknownLinks):
+    return readCodes, readLinks
+
+def writeCurrentCodes():
+    currentCodes, unknownLinks = getListedItems() #get the new items
+
+    if currentCodes == None: #if no items were found something probably fucked up
+            print("An Error has occured - no items found")
+            return 0, 0
+
+
     FcurrentCodes = open("currentCodes.txt", "w")
 
     for item in currentCodes:
@@ -61,25 +66,65 @@ def writeCurrentCodes(currentCodes, unknownLinks):
         FunknownLinks.write(" " + link)
     FunknownLinks.close()
 
-
+def linebreak():
+    print("---------------------------------------------------------------------------------------------------")
 
 
 def update():
     
-        currItemArr, unknownLinks = getListedItems() #gets the item codes and unkowns from DJ's
+        oldItemArr, oldUnknownLinks = readCurrentCodes() #gets the item codes and unkowns from DJ's
+        if oldItemArr == 0:
+            return
 
         if(len(sys.argv) == 3 ) and (sys.argv[2] == "-a"):
-            print("Here are all the current item codes: ")
-            print(currItemArr)
-        #removed = []
-        #new = []
-        #newItemArr, newUnknownLinks = getListedItems() #get the new items
+            print("Here are all the old item codes: ")
+            print(oldItemArr)
 
-        writeCurrentCodes(currItemArr, unknownLinks)
+        removed = []
+        new = []
+
+        writeCurrentCodes()
         
-        if currItemArr == None: #if no items were found something probably fucked up
-            print("An Error has occured - no items found")
-            return
+        newItemArr, newUnknownLinks = readCurrentCodes() #gets the item codes and unkowns from DJ's
+
+        for oldItem in oldItemArr: #checks to see if any items have been removed
+            if oldItem not in newItemArr:
+                removed.append(oldItem)
+
+        for newItem in newItemArr: #checks to see if there are any new items
+            if newItem not in oldItemArr:
+                new.append(newItem)
+
+        for oldLink in oldUnknownLinks: #checks if any links have been removed
+            if oldLink not in newUnknownLinks:
+                removed.append(oldLink)
+        
+        for newLink in newUnknownLinks: #checks if any new links have been added
+            if newLink not in oldUnknownLinks:
+                new.append(newLink)
+
+        linebreak()
+        if(len(new) == 0):
+            print("No new items")
+        else:
+            
+            print("Here are the new items: ")
+            for item in new:
+                print("\t"+item)
+        linebreak()
+        linebreak()
+        if len(removed) == 0:
+            print("No removed items")
+        else:
+            print("Here are the removed Items: ")
+            for item in removed:
+                print("\t"+item)
+        linebreak()
+
+
+
+
+        
         
 
 
@@ -99,15 +144,52 @@ def check():
                 print("\t{}".format(link))
         ### -c option ###
         if(len(sys.argv) == 3 and (sys.argv[2] == "-all" or sys.argv[2] == "-a")):
-            print("Here are all the item codes: ")
+            print("Here are all the currently stored item codes: ")
             print(currItemArr)
 
-        print("Here are the new ones: ")
-        controlArr = ['76945', '43204', '75337', '71410', '10975', '71033', '76401', '10972', '76396', '11026', '10938', '71406', '10973', '60354', '60339', '11024', '43203', '75333', '60345', '76398', '76402', '60341', '60340', '42135', '43206', '10970', '10965', '76946', '41715', '11025', '41717', '76403', '31131', '10283', '10971', '60349', '75334', '11019', '60342', '76949', '41718', '60346', '71408', '42137', '42139', '71767', '42144', '76944', '43205', '76948', '41705', '41710', '71768', '76206', '41711', '10969', '42140', '75336', '41702', '60316', '71032', '41696', '71774', '60353', '76217', '42145', '41716', '76216', '42138', '60350', '76397', '10302', '43209', '41703', '76400', '41714', '41708', '60337', '71403', '10942', '10962', '60348', '31123', '71769', '41699', '41701', '60344', '60321', '71397', '76205', '76185', '60322', '43198', '31124', '76207', '31125', '60338', '11023', '71765', '60355', '11017', '41704', '76203', '71760', '76195', '76237', '71404', '10960', '71773', '41712', '42125', '42127', '70688', '43199', '60317', '31132', '60312', '71402', '10967', '41720', '71764', '31126', '71407', '60328', '60315', '10966', '10964', '76204', '71401', '41694', '60325', '10977', '42134', '76184', '41679', '10980', '43208', '42133', '41700', '76943', '60320', '71757', '70690', '10932', '71759', '41713', '31127', '10282', '10281', '71772', '76193', '41684', '76389', '41719', '60343', '71775', '70689', '76182', '11018', '42123', '60318', '71766', '71770', '41697', '76399', '10974', '71771', '10941', '21046', '10959', '41695', '71400', '71387', '10968', '60288', '11015', '71755', '75318', '60300', '60283', '41681', '60293', '60281', '71365', '43196', '76387', '71396', '71703', '71398', '42122', '41448', '75948', '41441', '10291', '31119', '60330', '60287', '60295', '76183', '43197', '60256', '42118', '10944', '60319', '43180', '60314', '41439', '42126', '11006', '60276', '31120', '60299', '76145', '10930', '10948', '71737', '60301', '76154', '60285', '76156', '76157', '41689', '60242', '42129', '71382', '71393', '10696', '10961', '43195', '41677', '42111', '76238', '31113', '60323', 
-    '41691', '60284', '60253', '31112', '71399', '76155', '60329', '10940', '41683', '41685', '75315', '10947', '41707', '60294', '71388', '71749', '60306', '60302', '71385', '60291']
+        controlItemArr, controlLinkArr = readCurrentCodes()
+        new = []
+        removed = []
+
+
         for item in currItemArr:
-            if item not in controlArr:
-                print(item)
+            if item not in controlItemArr:
+                new.append(item)
+
+        for item in controlItemArr:
+            if item not in controlItemArr:
+                removed.append(item)
+
+        for Link in unknownLinks:
+            if Link not in controlLinkArr:
+                new.append(Link)
+
+        for Link in controlLinkArr:
+            if Link not in unknownLinks:
+                removed.append(Link)
+
+        linebreak()
+        if(len(new) == 0):
+            print("No new items")
+        else:
+            
+            print("Here are the new items: ")
+            for item in new:
+                print("\t"+item)
+        linebreak()
+        linebreak()
+        if len(removed) == 0:
+            print("No removed items")
+        else:
+            print("Here are the removed Items: ")
+            for item in removed:
+                print("\t"+item)
+        linebreak()
+        linebreak()
+        print("NO UPDATES WERE WRITTEN")
+        linebreak()        
+        
+
 
 def main():
     if(len(sys.argv)==1):
