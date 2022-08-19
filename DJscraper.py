@@ -1,6 +1,7 @@
 import sys
 from requests_html import HTMLSession
 import time
+import requests
 
 
 def getListedItems():
@@ -205,7 +206,26 @@ def searchFunc():
             print("\nNo, David Jones does not have {} in stock\n".format(code))
         code = input("What code would you like to check? (type 'quit' to leave) ")
 
-            
+def retire_status(code):
+    legoURL = "https://www.lego.com/en-hu/product/{}".format(code)
+    r = requests.get(legoURL)
+    if('"availabilityText":"Retired product"' in r.text):
+        print("\tRETIRED: {} | Link {}".format(code, legoURL))
+    
+def rcheck():
+    start = time.process_time()
+    linebreak()
+    print("Starting retire status check - This may take a while... starting timer")
+    if len(sys.argv) == 3 and sys.argv[2] == "-n":
+        pass
+    else:
+        currItems, unknownLinks = readCurrentCodes()
+        for item in currItems:
+            print("Next item {}".format(item))
+            retire_status(item)
+    linebreak()
+    stop = time.process_time()
+    print("Time Elapsed : {}s".format(stop - start))
 
 def main():
     if(len(sys.argv)==1):
@@ -219,6 +239,8 @@ def main():
         printFunc()
     elif sys.argv[1] == "-search":
         searchFunc()
+    elif sys.argv[1] == "-retired" or sys.argv[1] == "-rcheck":
+        rcheck()
     
 
 
