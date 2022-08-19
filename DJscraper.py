@@ -39,18 +39,43 @@ def getListedItems():
 
 
 def readCurrentCodes():
-    pass
+    FcurrentCodes = open("currentCodes.txt", "r")
+    readCodes = (FcurrentCodes.read()).split()
+    print(readCodes)
+    FcurrentCodes.close
 
-def writeCurrentCodes(currentCodes);
-    pass 
+    FunknownLinks = open("unknownLinks.txt", "r")
+    readLinks = (FunknownLinks.read()).split()
+    print(readLinks)
+    FunknownLinks.close()
+
+def writeCurrentCodes(currentCodes, unknownLinks):
+    FcurrentCodes = open("currentCodes.txt", "w")
+
+    for item in currentCodes:
+        FcurrentCodes.write(" " + item)
+    FcurrentCodes.close
+
+    FunknownLinks = open("unknownLinks.txt", "w")
+    for link in unknownLinks:
+        FunknownLinks.write(" " + link)
+    FunknownLinks.close()
+
+
+
 
 def update():
     
-        if(len(sys.argv) == 3 and sys.argv[2] == "-a"):
-            print("Here are all the item codes: ")
-            print(currItemArr)
-
         currItemArr, unknownLinks = getListedItems() #gets the item codes and unkowns from DJ's
+
+        if(len(sys.argv) == 3 ) and (sys.argv[2] == "-a"):
+            print("Here are all the current item codes: ")
+            print(currItemArr)
+        #removed = []
+        #new = []
+        #newItemArr, newUnknownLinks = getListedItems() #get the new items
+
+        writeCurrentCodes(currItemArr, unknownLinks)
         
         if currItemArr == None: #if no items were found something probably fucked up
             print("An Error has occured - no items found")
@@ -71,9 +96,9 @@ def check():
         if len(unknownLinks) != 0: #if there are unknown links show them
             print("Some unknown links have been found:")
             for link in unknownLinks:
-                print("     {}".format(link))
+                print("\t{}".format(link))
         ### -c option ###
-        if(len(sys.argv) == 3 and (sys.argv[2] == "-check" or sys.argv[2] == "-c"):
+        if(len(sys.argv) == 3 and (sys.argv[2] == "-all" or sys.argv[2] == "-a")):
             print("Here are all the item codes: ")
             print(currItemArr)
 
@@ -87,8 +112,6 @@ def check():
 def main():
     if(len(sys.argv)==1):
         print("Whatcha tryin to do pal? Your options are:\n\t -update : updates the recorded lego codes (currentCodes.txt)\n\t -check : checks for any new lego products\n\t")
-
-
     if(sys.argv[1] == "-update"):
         update()
     elif sys.argv[1] =="-check":
@@ -104,5 +127,3 @@ def main():
 
 
 main()
-
-
