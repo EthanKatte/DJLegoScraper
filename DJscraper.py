@@ -1,10 +1,14 @@
+from concurrent.futures import process
+import os
 import sys
 from requests_html import HTMLSession
 import time
 import requests
+import webbrowser
+import multiprocessing
 
 
-def getListedItems():
+def getListedItems(): #gets the product links for the DJ website
     codes = []
     unknownLinks = []
     numberTotal = 0
@@ -48,7 +52,7 @@ def readCurrentCodes(): #reads and returns the most recent save of the codes on 
 
     return readCodes, readLinks
 
-def writeCurrentCodes():
+def writeCurrentCodes(): #writes the current codes to persistant files
     currentCodes, unknownLinks = getListedItems() #get the new items
 
     if currentCodes == None: #if no items were found something probably fucked up
@@ -67,10 +71,10 @@ def writeCurrentCodes():
         FunknownLinks.write(" " + link)
     FunknownLinks.close()
 
-def linebreak():
+def linebreak(): #prints a line break... so fancy
     print("---------------------------------------------------------------------------------------------------")
 
-def update():
+def update(): #updates the files and shows any new codes and removed ones
     
         oldItemArr, oldUnknownLinks = readCurrentCodes() #gets the item codes and unkowns from DJ's
         if oldItemArr == 0:
@@ -121,7 +125,7 @@ def update():
                 print("\t"+item)
         linebreak()
 
-def check():
+def check(): #shows any new codes and any removed ones - DOES NOT SAVE
     ###GETTING THE CODES FROM DavidJones.com###
         currItemArr, unknownLinks = getListedItems() #gets the item codes and unkowns from DJ's
 
@@ -147,7 +151,7 @@ def check():
                 new.append(item)
 
         for item in controlItemArr:
-            if item not in controlItemArr:
+            if item not in currItemArr:
                 removed.append(item)
 
         for Link in unknownLinks:
@@ -179,7 +183,7 @@ def check():
         print("NO UPDATES WERE WRITTEN")
         linebreak()        
         
-def printFunc():
+def printFunc(): #prints all currently available codes on davidjones.com
     curritems, currLinks = readCurrentCodes()
     linebreak()
     for item in curritems:
@@ -190,7 +194,7 @@ def printFunc():
         print(link)
     linebreak()
 
-def searchFunc():
+def searchFunc(): #allows for the checking of specific codes ... this is pretty useless... 
     
     argLength = len(sys.argv)
     if argLength == 3 and sys.argv[2] == "-new":
@@ -206,23 +210,89 @@ def searchFunc():
             print("\nNo, David Jones does not have {} in stock\n".format(code))
         code = input("What code would you like to check? (type 'quit' to leave) ")
 
-def retire_status(code):
+def retire_status(code): #gets html from lego.com and looks for retired string
     legoURL = "https://www.lego.com/en-hu/product/{}".format(code)
     r = requests.get(legoURL)
     if('"availabilityText":"Retired product"' in r.text):
         print("\tRETIRED: {} | Link {}".format(code, legoURL))
+        if len(sys.argv) == 3 and sys.argv[2] == "-open":
+            webbrowser.open(legoURL)
+
+def seperatecodes(codes): #seperates the codes into 4 subsets for the children
     
+    code1 = []
+    code2 = []
+    code3 = []
+    code4 = []
+    codeNum = 0
+
+    for code in codes:
+        if codeNum == 0:
+            code1.append(code)
+            codeNum += 1
+        elif codeNum == 1:
+            code2.append(code)
+            codeNum += 1
+        elif codeNum == 2:
+            code3.append(code)
+            codeNum += 1
+        elif codeNum == 3:
+            code4.append(code)
+            codeNum -= 3
+
+    return code1,code2,code3,code4
+
+def child_multi_retireCheck(codes, childNum): #run the retire check for each of the childrens lists
+    count = 0
+    for item in codes:
+        print("{}:{} | processing code {}".format(childNum, count, item))
+        retire_status(item)
+        count+=1
+    
+
+def multi_rcheck(): #responsible for the creation, delegation, processing and destruction of the children
+    start_time = time.perf_counter()
+    linebreak()
+    print("Starting retire status check - This may take a while... starting timer")
+    print("Child:Index | Lego Code")
+
+    currItems, unknownLinks = readCurrentCodes()
+
+    code1, code2, code3, code4 = seperatecodes(currItems) #divy up the code arr to the 4 children
+
+    proc1 = multiprocessing.Process(target=child_multi_retireCheck, args = (code1, 1)) #create the children
+    proc2 = multiprocessing.Process(target=child_multi_retireCheck, args = (code2, 2))
+    proc3 = multiprocessing.Process(target=child_multi_retireCheck, args = (code3, 3))
+    proc4 = multiprocessing.Process(target=child_multi_retireCheck, args = (code4, 4))
+
+    proc1.start() #start the children
+    proc2.start()
+    proc3.start()
+    proc4.start()
+
+    proc1.join() #join the children
+    print("proc1  closed")
+    proc2.join()
+    print("proc2  closed")
+    proc3.join()
+    print("proc3  closed")
+    proc4.join()
+    print("proc4  closed")
+    end_time = time.perf_counter()
+    print("runtime : {}s".format(end_time - start_time))
+
+
+
+
+
 def rcheck():
     start = time.process_time()
     linebreak()
-    print("Starting retire status check - This may take a while... starting timer")
-    if len(sys.argv) == 3 and sys.argv[2] == "-n":
-        pass
-    else:
-        currItems, unknownLinks = readCurrentCodes()
-        for item in currItems:
-            print("Next item {}".format(item))
-            retire_status(item)
+    currItems, unknownLinks = readCurrentCodes()
+    for item in currItems:
+        print("Next item {}, pid: {}".format(item, os.getpid))
+        retire_status(item)
+
     linebreak()
     stop = time.process_time()
     print("Time Elapsed : {}s".format(stop - start))
@@ -241,14 +311,8 @@ def main():
         searchFunc()
     elif sys.argv[1] == "-retired" or sys.argv[1] == "-rcheck":
         rcheck()
-    
+    elif sys.argv[1] == "-multi_retired":
+        multi_rcheck()
 
-
-
-    
-    
-    
-
-
-
-main()
+if __name__ == "__main__":
+    main()
