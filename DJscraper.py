@@ -299,7 +299,7 @@ def rcheck():
 
 def main():
     if(len(sys.argv)==1):
-        print("Whatcha tryin to do pal? Your options are:\n\t -update : updates the recorded lego codes (currentCodes.txt, currentLinks.txt)\n\t -check : checks for any new lego products\n\t -print : prints all the current records\n\t -search : search for a code (use -new to search through an updated list)")
+        print("Whatcha tryin to do pal? Your options are:\n\t -update : updates the recorded lego codes (currentCodes.txt, currentLinks.txt)\n\t -check : checks for any new lego products\n\t -print : prints all the current records\n\t -search : search for a code (use -new to search through an updated list)\n\t -rcheck : compares the product codes to lego.com to see if they are retired (takes a long time)\n\t -multi_rcheck : performs the retired check across multiple cores, speeding up the check to ~20 min (use -open to open the retired products page automatically) ")
         return
     if(sys.argv[1] == "-update"):
         update()
@@ -311,7 +311,7 @@ def main():
         searchFunc()
     elif sys.argv[1] == "-retired" or sys.argv[1] == "-rcheck":
         rcheck()
-    elif sys.argv[1] == "-multi_retired":
+    elif sys.argv[1] == "-multi_retired" or sys.argv[1] == "-multi_rcheck":
         multi_rcheck()
 
 if __name__ == "__main__":
