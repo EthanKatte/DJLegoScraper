@@ -5,6 +5,10 @@ This is a script that scrapes the DavidJones.com.au website for all lego product
 
 ![image](https://user-images.githubusercontent.com/61607335/222857918-e149b08f-f4c0-48bd-b112-4c94356ae99b.png)
 
+Any retired items will be shown in the output.
+
+![image](https://user-images.githubusercontent.com/61607335/222865764-e75a6b44-2a0a-4c5d-8c9a-a0a6160ff2f8.png)
+
 ## How To Use It
 This has a few different options for CMD Controls
 ![image](https://user-images.githubusercontent.com/61607335/222863997-8ffbbd82-69d2-4282-bdb2-347d2d1cf35b.png)
