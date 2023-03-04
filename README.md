@@ -1,11 +1,11 @@
 # David Jones Lego Scraper
-##What is it?
+## What is it?
 This is a script that scrapes the DavidJones.com.au website for all lego products currently available. It then looks at the respective pages on Lego.com to find any sets that are retired. THIS IS NOT FAST. THIS WILL NOT BE OPTIMISED FURTHER. This was my first attempt at a webscraper and was unaware of the nuances of beautifulSoup or requests-html libraries. It ingests the full HTML of the site and then does substring search for specific formats to determine the available lego codes. A much better way to do this is to find by class or ID and then process from there.
 
 
 ![image](https://user-images.githubusercontent.com/61607335/222857918-e149b08f-f4c0-48bd-b112-4c94356ae99b.png)
 
-##How To Use It
+## How To Use It
 This has a few different options for CMD Controls
 ![image](https://user-images.githubusercontent.com/61607335/222863997-8ffbbd82-69d2-4282-bdb2-347d2d1cf35b.png)
 To run the program use `python ./DJscraper.py [parameter]`
